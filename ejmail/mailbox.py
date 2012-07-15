@@ -24,19 +24,19 @@ class Mailbox(object):
         self.storage = Storage([self.cpsdesc])
         self.conversations = {}
 
-    def recv(self, data, id):
+    def recv(self, data):
         '''
         >>> m = Mailbox(['udp4', ['localhost',9898], 'ejmail-test'])
         >>> m.add_conversation("Demonstration")
         >>> def msgcallback(msg):
-        ...     print msg.id
+        ...     print msg.hash
         ...     print msg.content
         >>> m.conversations["Demonstration"].on_message = msgcallback
-        >>> m.recv({'conversation':'Demonstration', 'content':'Demo content'}, 31)
-        31
+        >>> m.recv({'conversation':'Demonstration', 'content':'Demo content'})
+        306bdbd690d9910acf002ea6dc25cf6440ae6c85
         Demo content
         '''
-        message = Message(data, id)
+        message = Message(data)
         convo = message.conversation
         if convo in self.conversations:
             self.conversations[convo].register_message(message)

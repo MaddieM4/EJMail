@@ -1,7 +1,9 @@
+from ejtp.util import hasher
+
 class Message(object):
-    def __init__(self, data, id=0):
+    def __init__(self, data):
         self.data = data
-        self.id = id
+        self.hash = hasher.checksum(data)
 
     @property
     def content(self):
