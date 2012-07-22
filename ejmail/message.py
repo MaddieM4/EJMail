@@ -5,6 +5,9 @@ class Message(object):
         self.data = data
         self.hash = hasher.checksum(data)
 
+    def __str__(self):
+        return hasher.strict(self.data)
+
     @property
     def content(self):
         return self.data['content']
