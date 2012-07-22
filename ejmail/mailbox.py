@@ -33,7 +33,7 @@ class Mailbox(object):
         self.unread = {}
         self.conversations = {}
 
-    def recv(self, data):
+    def recv(self, data, addr=None):
         '''
         Interpret an email recieved through EJTP client.
 
@@ -48,6 +48,8 @@ class Mailbox(object):
         Demo content
         '''
         message = Message(data)
+        if addr:
+            self.ack(message, addr)
         convo = message.conversation
         self.add_conversation(convo)
         convo_obj = self.conversations[convo]
@@ -74,7 +76,7 @@ class Mailbox(object):
         msg_type = msg_dict['type']
         msg_data = msg_dict['data']
         if msg_type == "ejmail-message":
-            self.recv(msg_data)
+            self.recv(msg_data, msg.addr)
         elif msg_type == "ejmail-mark":
             saddr = address.str_address(msg.addr)
             for hash in msg_data:
@@ -106,6 +108,8 @@ class Mailbox(object):
         [u'Wazzaaaappp']
         >>> m4.conversations['Wazzaaaappp'].timeline()[0].content
         u"I'm druunnkkkk"
+        >>> m3.unread
+        {'["udp4",["localhost",9004],"jeff"]': {}}
         '''
         convo = msg.conversation
         self.add_conversation(convo)
@@ -122,3 +126,12 @@ class Mailbox(object):
             if not saddr in self.unread:
                 self.unread[saddr] = {}
             self.unread[saddr][msg.hash] = msg
+
+    def ack(self, message, addr):
+        self.client.write_json(
+            address.py_address(addr),
+            {
+                'type':'ejmail-mark',
+                'data':[message.hash],
+            }
+        )
